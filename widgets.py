@@ -96,9 +96,10 @@ class TapWidget(Widget,object):
 
         self.set_rect(x, y, w, h)
 
-        self._font_size = 30
-        self._font = pygame.font.Font(ARIAL_FONT, self._font_size)
-        
+        self._font_size = 16
+        # self._font = pygame.font.Font(ARIAL_FONT, self._font_size)
+        self._font = pygame.font.Font("regular.ttf", self._font_size)
+
         self._served = 0
         self._full = 0
         self._name = ''
@@ -131,7 +132,7 @@ class TapWidget(Widget,object):
 #        if self._oz_remaining < 0:
 #            self._oz_remaining = 0
 
-        if self._oz_remaining > 5:
+        if self._oz_remaining > 14:
             self._oz_color = color_white
         else:
             self._oz_color = color_red
@@ -152,11 +153,11 @@ class TapWidget(Widget,object):
         y = self._rect.y + 10
         # self.name_pos.move_ip(x - self.name_pos.x, y - self.name_pos.y)
         xoff = (self._rect.w - self.name_pos.w) / 2
-        self.name_pos.move_ip(xoff, 10)
+        self.name_pos.move_ip(xoff, 3)
 
         self._oz_text = self._font.render('{0:.1f} pints'.format(self._oz_remaining), self._font_size/2, self._oz_color)
         self._oz_pos = self._oz_text.get_rect()
-        self._oz_pos.move_ip((self._rect.w - self._oz_pos.w)/2, self.name_pos.y + self.name_pos.h + 5)
+        self._oz_pos.move_ip((self._rect.w - self._oz_pos.w)/2, self._rect.h - self._oz_pos.h - 3)
 
     def draw(self):
         if self._name is None:
@@ -164,7 +165,7 @@ class TapWidget(Widget,object):
         #self.drawMyRectFilled(self._screen)
         self.drawMyRect(self._screen, color=color_gray)
         self._screen.blit(self.name_text, self.name_pos.move(self._rect.topleft))
-        self._screen.blit(self._oz_text, self._oz_pos.move(self._rect.topleft))
+        self._screen.blit(self._oz_text, self._oz_pos.move(self._rect.topleft) )
 
     def update(self):
         pass
@@ -178,8 +179,9 @@ class TapDetail(Widget, object):
         self._margin = 10
         self._name = ''
 
-        self._name_font_size = 30
-        self._name_font = pygame.font.Font(TapDetail.NAME_FONT, self._name_font_size)
+        self._name_font_size = 24
+        self._name_font = pygame.font.Font("regular.ttf", self._name_font_size)
+        # self._name_font = pygame.font.Font(TapDetail.NAME_FONT, self._name_font_size)
 
         self._desc_font = pygame.font.Font(None, 20)
 

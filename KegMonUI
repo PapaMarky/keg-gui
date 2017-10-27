@@ -38,6 +38,8 @@ def setup():
     y = y + h + MARGIN
     tap_detail3 = widgets.TapDetail(screen, 2, x, y, w, h)
 
+    pygame.font.Font("regular.ttf", 16)
+
     print 'FONT LIST:'
     print '{}'.format(pygame.font.get_fonts())
 
