@@ -19,6 +19,7 @@ def setup():
     global tap_detail1, tap_detail2, tap_detail3
     pygame.init()
     screen = pygame.display.set_mode((640,480), HWSURFACE | DOUBLEBUF | RESIZABLE)
+    pygame.display.set_caption('Shape Kegbot')
 
     tap1 = widgets.TapWidget(screen, 0)
     tap2 = widgets.TapWidget(screen, 1)
