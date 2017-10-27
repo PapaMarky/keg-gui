@@ -12,47 +12,6 @@ color_gray = (0x42, 0x42, 0x42)
 
 ARIAL_FONT = None
 
-# draw some text into an area of a surface
-# automatically wraps words
-# returns any text that didn't get blitted
-def drawText(surface, text, color, rect, font, aa=False, bkg=None):
-    rect = Rect(rect)
-    y = rect.top
-    lineSpacing = -2
-
-    # get the height of the font
-    fontHeight = font.size("Tg")[1]
-
-    while text:
-        i = 1
-
-        # determine if the row of text will be outside our area
-        if y + fontHeight > rect.bottom:
-            break
-
-        # determine maximum width of line
-        while font.size(text[:i])[0] < rect.width and i < len(text):
-            i += 1
-
-        # if we've wrapped the text, then adjust the wrap to the last word      
-        if i < len(text): 
-            i = text.rfind(" ", 0, i) + 1
-
-        # render the line and blit it to the surface
-        if bkg:
-            image = font.render(text[:i], 1, color, bkg)
-            image.set_colorkey(bkg)
-        else:
-            image = font.render(text[:i], aa, color)
-
-        surface.blit(image, (rect.left, y))
-        y += fontHeight + lineSpacing
-
-        # remove the text we just blitted
-        text = text[i:]
-
-    return text
-
 class Widget(object):
     def __init__(self, screen):
         self._screen = screen
@@ -67,6 +26,58 @@ class Widget(object):
     def drawMyRectFilled(self, screen, color=color_black):
         pygame.draw.rect(screen, color, self._rect)
 
+class WrappedText(Widget):
+    def __init__(self, screen, font, x, y, w, h):
+        super(WrappedText, self).__init__(screen)
+        self._text = None
+        self._text_image = None
+        self._text_image_size = None
+        self.set_rect(x, y, w, h)
+        self._font = font
+
+    # draw some text into an area of a surface
+    # automatically wraps words
+    # returns any text that didn't get blitted
+    def drawText(surface, text, color, rect, font, aa=False, bkg=None):
+        rect = Rect(rect)
+        y = rect.top
+        lineSpacing = -2
+
+        # get the height of the font
+        fontHeight = font.size("Tg")[1]
+
+        while text:
+            i = 1
+
+            # determine if the row of text will be outside our area
+            if y + fontHeight > rect.bottom:
+                break
+
+            # determine maximum width of line
+            while font.size(text[:i])[0] < rect.width and i < len(text):
+                i += 1
+
+            # if we've wrapped the text, then adjust the wrap to the last word      
+            if i < len(text): 
+                i = text.rfind(" ", 0, i) + 1
+
+            # render the line and blit it to the surface
+            if bkg:
+                image = font.render(text[:i], 1, color, bkg)
+                image.set_colorkey(bkg)
+            else:
+                image = font.render(text[:i], aa, color)
+
+            surface.blit(image, (rect.left, y))
+            y += fontHeight + lineSpacing
+
+            # remove the text we just blitted
+            text = text[i:]
+
+        return text
+
+#    def set_text(self, t):
+        
 class TapWidget(Widget,object):
     def __init__(self, screen, tap_number):
         super(TapWidget, self).__init__(screen)
@@ -142,21 +153,28 @@ class TapWidget(Widget,object):
         pass
 
 class TapDetail(Widget, object):
+    NAME_FONT = None
     def __init__(self, screen, tap_number, x, y, w, h):
         super(TapDetail, self).__init__(screen)
         self.set_rect(x, y, w, h)
         self._tap = tap_number
-
+        self._margin = 10
         self._name = ''
+
+        self._name_font_size = 30
+        self._name_font = pygame.font.Font(TapDetail.NAME_FONT, self._name_font_size)
 
     def draw(self):
         self.drawMyRect(self._screen, color=color_blue)
         self._screen.blit(self._logo_scaled, self._rect.topleft)
+        self._screen.blit(self._name_text, self._name_text_pos)
 
     def get_image(self, pic_url):
         image_cache = '/tmp/kegui'
         basename = os.path.basename(pic_url)
 
+        # TODO(mdyer) Check for images in /home/kegbot/XXX so that we don't DL them when
+        # we are on the server
         cache_path = os.path.join(image_cache, basename)
         if os.path.exists(cache_path):
             print 'CACHE HIT! {}'.format(cache_path)
@@ -179,7 +197,11 @@ class TapDetail(Widget, object):
         self._logo = pygame.image.load(image_path)
         w = self._rect.h
 
-        self._logo_scaled = self._logo
-#        self._logo_scaled = pygame.transform.smoothscale(self._logo, (w, w))
+        self._logo_scaled = pygame.transform.smoothscale(self._logo, (w, w))
 
+        x = self._logo_scaled.get_rect().x + self._logo_scaled.get_rect().w + self._margin
+        y = self._rect.y
+        self._name_text = self._name_font.render(self._name, 1, color_white)
+        self._name_text_pos = self._name_text.get_rect()
+        self._name_text_pos.move_ip(x,y)
         # print '{}: {}'.format(self._tap, info)

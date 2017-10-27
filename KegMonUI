@@ -27,12 +27,14 @@ def setup():
     x = 5
     y = 0
     w = screen.get_width() - 10
-    h = (screen.get_height() - tap1.get_rect().h) / 3
-    
+    MARGIN = 10
+    h = (screen.get_height() - tap1.get_rect().h - (MARGIN * 4)) / 3
+
+    y = y + MARGIN
     tap_detail1 = widgets.TapDetail(screen, 0, x, y, w, h)
-    y = y + h
+    y = y + h + MARGIN
     tap_detail2 = widgets.TapDetail(screen, 1, x, y, w, h)
-    y = y + h
+    y = y + h + MARGIN
     tap_detail3 = widgets.TapDetail(screen, 2, x, y, w, h)
 
     print 'FONT LIST:'
