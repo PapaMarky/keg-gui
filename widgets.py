@@ -33,7 +33,8 @@ class WrappedText(Widget):
         self._text_image = None
         self._text_image_size = None
         self.set_rect(x, y, w, h)
-        self._font = font
+        # self._font = font
+        self._font = pygame.font.Font("regular.ttf", 14)
 
     # draw some text into an area of a surface
     # automatically wraps words
@@ -96,7 +97,7 @@ class TapWidget(Widget,object):
 
         self.set_rect(x, y, w, h)
 
-        self._font_size = 16
+        self._font_size = 14
         # self._font = pygame.font.Font(ARIAL_FONT, self._font_size)
         self._font = pygame.font.Font("regular.ttf", self._font_size)
 
@@ -105,6 +106,8 @@ class TapWidget(Widget,object):
         self._name = ''
 
         self._description_widget = None
+
+        self._keg = pygame.image.load("kegimage.png")
 
     def get_rect(self):
         return self._rect
@@ -146,7 +149,8 @@ class TapWidget(Widget,object):
         s = self._font_size
         while self.name_pos.w > self._rect.w or self.name_pos.h > self._rect.h:
             s = s - 1
-            font = pygame.font.Font(None, s)
+            # font = pygame.font.Font(None, s)
+            font = pygame.font.Font("regular.ttf", s)
             self.name_text = font.render(self._name, 1, color_white)
             self.name_pos = self.name_text.get_rect()
         x = self._rect.w / 2 - self.name_pos.w / 2
@@ -183,7 +187,8 @@ class TapDetail(Widget, object):
         self._name_font = pygame.font.Font("regular.ttf", self._name_font_size)
         # self._name_font = pygame.font.Font(TapDetail.NAME_FONT, self._name_font_size)
 
-        self._desc_font = pygame.font.Font(None, 20)
+        self._desc_font = pygame.font.Font("regular.ttf", 14)
+
 
     def draw(self):
         if self._name is None:
@@ -243,8 +248,8 @@ class TapDetail(Widget, object):
         self._name_text_pos.move_ip(x,y)
         # print '{}: {}'.format(self._tap, info)
 
-        w = self._rect.width - self._logo_scaled.get_rect().width - self._margin
+        w = self._rect.width - self._logo_scaled.get_rect().width - self._margin - 10
         h = self._rect.height - self._name_text.get_rect().height
         y = self._rect.y + self._name_text_pos.h
-        self._description_widget = WrappedText(self._screen, self._desc_font, x, y, w, h)
+        self._description_widget = WrappedText(self._screen, self._desc_font, x+10, y, w, h)
         self._description_widget.set_text(info['description'])
