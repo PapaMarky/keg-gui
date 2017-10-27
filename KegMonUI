@@ -1,0 +1,94 @@
+#!/usr/bin/python
+import time
+import pygame
+from pygame.locals import *
+
+import db
+import widgets
+
+tap1 = None
+tap2 = None
+tap3 = None
+
+tap_detail1 = None
+tap_detail2 = None
+tap_detail3 = None
+
+def setup():
+    global tap1, tap2, tap3
+    global tap_detail1, tap_detail2, tap_detail3
+    pygame.init()
+    screen = pygame.display.set_mode((640,480), HWSURFACE | DOUBLEBUF | RESIZABLE)
+
+    tap1 = widgets.TapWidget(screen, 0)
+    tap2 = widgets.TapWidget(screen, 1)
+    tap3 = widgets.TapWidget(screen, 2)
+
+    x = 5
+    y = 0
+    w = screen.get_width() - 10
+    h = (screen.get_height() - tap1.get_rect().h) / 3
+    
+    tap_detail1 = widgets.TapDetail(screen, 0, x, y, w, h)
+    y = y + h
+    tap_detail2 = widgets.TapDetail(screen, 1, x, y, w, h)
+    y = y + h
+    tap_detail3 = widgets.TapDetail(screen, 2, x, y, w, h)
+
+    print 'FONT LIST:'
+    print '{}'.format(pygame.font.get_fonts())
+
+    return screen
+
+def loop():
+    global tap1, tap2, tap3
+    done = False
+
+    last_update = pygame.time.get_ticks() - 10000
+    drink_time = -10000
+    drink_info = db.get_last_drink()
+    last_drink = drink_info[0]['id']
+    print 'last_drink: {}'.format(last_drink)
+
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+
+        t = pygame.time.get_ticks()
+        if t - last_update > 750:
+            # only update the tap info once every TBD seconds
+            tap_info = db.get_tap_info()
+            tap1.set_info(tap_info[0])
+            tap2.set_info(tap_info[1])
+            tap3.set_info(tap_info[2])
+
+            tap_detail1.set_info(tap_info[0])
+            tap_detail2.set_info(tap_info[1])
+            tap_detail3.set_info(tap_info[2])
+
+            drink_info = db.get_last_drink()
+            if last_drink != drink_info[0]['id']:
+                last_drink = drink_info[0]['id']
+                drink_time = t
+            
+
+        screen.fill(widgets.color_black)
+        tap1.draw()
+        tap2.draw()
+        tap3.draw()
+        
+        tap_detail1.draw()
+        tap_detail2.draw()
+        tap_detail3.draw()
+
+        if t - drink_time < 1500:
+            r = pygame.Rect(50, 50, screen.get_width() - 100, screen.get_height() - tap1.get_rect().h - 100)
+            pygame.draw.rect(screen, widgets.color_white, r)
+        
+        pygame.display.update()
+
+if __name__ == '__main__':
+    screen = setup()
+    loop()
+
