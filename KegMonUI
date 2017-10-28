@@ -6,6 +6,8 @@ from pygame.locals import *
 import db
 import widgets
 
+import json
+
 tap1 = None
 tap2 = None
 tap3 = None
@@ -65,6 +67,7 @@ def loop():
             last_update = t
             # only update the tap info once every TBD seconds
             t_info = db.get_tap_info()
+
             tap_info = [None, None, None]
 
             for tin in t_info:

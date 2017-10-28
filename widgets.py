@@ -107,8 +107,6 @@ class TapWidget(Widget,object):
 
         self._description_widget = None
 
-        self._keg = pygame.image.load("kegimage.png")
-
     def get_rect(self):
         return self._rect
 
@@ -163,13 +161,24 @@ class TapWidget(Widget,object):
         self._oz_pos = self._oz_text.get_rect()
         self._oz_pos.move_ip((self._rect.w - self._oz_pos.w)/2, self._rect.h - self._oz_pos.h - 3)
 
+        # get the keg image and scale it to the window size
+        self._keg = pygame.image.load("kegimage.png")
+        w = self._rect.h - self._oz_text.get_rect().h - self.name_text.get_rect().h
+        self._keg_scaled = pygame.transform.smoothscale(self._keg, (w, w))
+        self._keg_pos = self.name_text.get_rect()
+        self._keg_pos.move_ip((self._rect.w - self._keg_pos.w)/2, self._keg_pos.h/2)
+
+
     def draw(self):
         if self._name is None:
             return
         #self.drawMyRectFilled(self._screen)
         self.drawMyRect(self._screen, color=color_gray)
         self._screen.blit(self.name_text, self.name_pos.move(self._rect.topleft))
-        self._screen.blit(self._oz_text, self._oz_pos.move(self._rect.topleft) )
+
+        if self._name != "NO BEER":
+            self._screen.blit(self._oz_text, self._oz_pos.move(self._rect.topleft))
+            self._screen.blit(self._keg_scaled, self._keg_pos.move(self._rect.topleft) )
 
     def update(self):
         pass
@@ -224,6 +233,7 @@ class TapDetail(Widget, object):
             self._name = None
         if info['name'] == self._name:
             return
+
         self._name = info['name']
 
         image_path = self.get_image(info['pic_url'])
